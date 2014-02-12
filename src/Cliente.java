@@ -46,8 +46,7 @@ public class Cliente{
     }
     
     public void enviarUnicast(String direccion, String mensaje, int port){
-        try {
-            int mensajeLength = mensaje.getBytes("UTF-8").length;
+            int mensajeLength = mensaje.getBytes().length;
             int cantPaquetes = (mensajeLength / this.limit) + 1;
             
             try {
@@ -56,13 +55,18 @@ public class Cliente{
                 ex.printStackTrace();
             }
             byte[] buffer = new byte[mensajeLength];
-            buffer = mensaje.getBytes("UTF-8");
+            buffer = mensaje.getBytes();
             
             if(cantPaquetes == 0) 
                 cantPaquetes = 1;
-
+            
+            int capacidad = this.limit;
             for(int i = 0; i < cantPaquetes; i++) {
-                buf = Arrays.copyOfRange(buffer, i * this.limit, (i + 1) * this.limit);
+                if(mensajeLength < this.limit)
+                    capacidad = mensajeLength;
+                buf = Arrays.copyOfRange(buffer, i * capacidad, (i + 1) * capacidad);
+                mensajeLength -= this.limit;
+                
                 paquete =  new DatagramPacket(buf, buf.length,address,port);
                 try {
                     socket.send(paquete);
@@ -70,9 +74,6 @@ public class Cliente{
                     Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
                 } 
             }
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     public class grupoMulticast extends Thread{
