@@ -11,7 +11,10 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JTextArea;
+import javax.swing.ListModel;
 
 /**
  *
@@ -22,10 +25,13 @@ public class Servidor extends Thread{
     JTextArea jtareaRecibidos;
     int port;
     int limit;
+    Interfaz interfaz;
+    DefaultListModel listmodel;
     
-    public Servidor(JTextArea jtarea, int port, int limit){
+    public Servidor(Interfaz interfaz, int port, int limit){
         this.port = port;
         this.limit = limit;
+        this.interfaz = interfaz;
         try {
             socket = new DatagramSocket(this.port);
         } catch (SocketException ex) {
@@ -33,7 +39,8 @@ public class Servidor extends Thread{
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        jtareaRecibidos = jtarea;
+        jtareaRecibidos = this.interfaz.getjTextArea1();
+        listmodel = this.interfaz.listMulticastGroup;
     }
             @Override
             public void run() {
@@ -46,6 +53,10 @@ public class Servidor extends Thread{
                            socket.receive(packet);
 
                            mensaje = new String(packet.getData(), 0, packet.getLength());
+                           
+                           if(mensaje.startsWith("Multicast-")) {
+                               AgregarGrupoMulticast(mensaje.substring(10));
+                           }
                            AgregarRecibidos(packet.getAddress().toString() + ": " + mensaje);
                         } catch (IOException ex) {
                             ex.printStackTrace();
@@ -53,6 +64,10 @@ public class Servidor extends Thread{
                      }
             }
                 
+      public void AgregarGrupoMulticast(String mensaje) {
+          listmodel.addElement(mensaje);
+      }
+
       public void AgregarRecibidos(String mensaje){
           jtareaRecibidos.append(mensaje + "\n");
          
