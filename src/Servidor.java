@@ -70,7 +70,6 @@ public class Servidor extends Thread{
 
       public void AgregarRecibidos(String mensaje){
           jtareaRecibidos.append(mensaje + "\n");
-         
       }
 
 }

@@ -34,7 +34,8 @@ public class Interfaz extends javax.swing.JFrame {
     Servidor server; 
     Cliente client;
     int port = 30000;
-    int limit = 20;
+    int portMulticast = 4446;
+    int limit = 40;
     DefaultListModel listMulticastGroup;
     
     public Interfaz() {
@@ -44,9 +45,7 @@ public class Interfaz extends javax.swing.JFrame {
         jList1.setModel(listMulticastGroup);
         server = new Servidor(this,this.port,this.limit);
         server.start();
-        client = new Cliente(this.port, this.limit); 
-       
-        
+        client = new Cliente(this.port, this.limit, this.jTextArea1);
         
     }
 
@@ -141,13 +140,28 @@ public class Interfaz extends javax.swing.JFrame {
 
         jButton2.setText("Unirse al grupo");
         jButton2.setToolTipText("");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Enviar");
         jButton3.setEnabled(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Grupo Multicast:");
 
         jButton5.setText("Crear Grupo");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("Grupos Multicast Disponibles:");
 
@@ -287,7 +301,7 @@ public class Interfaz extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        client.enviarUnicast(jTextField1.getText(), jTextArea2.getText() );
+        client.enviarUnicast(jTextField1.getText(), jTextArea2.getText(), this.port);
         limpiarCampo();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -318,8 +332,34 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1FocusGained
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        client.enviarUnicast("255.255.255.255", jTextArea2.getText());
+        client.enviarUnicast("255.255.255.255", jTextArea2.getText(), this.port);
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if(!listMulticastGroup.isEmpty() && !client.conexionGrupo.unidoAlGrupo) {
+            String elemento = (String) listMulticastGroup.getElementAt(jList1.getSelectedIndex());
+            client.conexionGrupo.unidoAlGrupo = true;
+            client.conexionGrupo.start();
+            jButton2.setText("Salir del grupo");
+        } else if(client.conexionGrupo.unidoAlGrupo) {
+            client.conexionGrupo.detenerHilo();
+            jButton2.setText("Unirse al grupo");
+        }
+            
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        jTextField3.setEnabled(false);
+        jButton5.setEnabled(false);
+        jButton3.setEnabled(true);
+        String grupo = jTextField3.getText();
+        client.conexionGrupo.setGrupo(grupo);
+        client.enviarUnicast("255.255.255.255", "Multicast-" + grupo, this.port);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        client.enviarUnicast(jTextField3.getText(), jTextArea2.getText(), this.portMulticast);
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void limpiarCampo() {
         jTextArea2.setText("");
