@@ -29,14 +29,12 @@ public class Cliente{
     InetAddress address;
     int port;
     int limit; 
-    grupoMulticast conexionGrupo;
     JTextArea logs;
     
     public Cliente(int port, int limit, JTextArea logs) {
         this.port = port;
         this.limit = limit;
         this.logs = logs;
-        conexionGrupo = new grupoMulticast();
 
         try {
             socket = new DatagramSocket();
@@ -75,59 +73,4 @@ public class Cliente{
                 } 
             }
     }
-    
-    public class grupoMulticast extends Thread{
-        String grupo;
-        boolean unidoAlGrupo = false;
-        MulticastSocket socket;
-        
-        public void setGrupo(String grupo) {
-            this.grupo = grupo;
-        }
-        
-        @Override
-        public void run() {
-            try {
-                while(unidoAlGrupo) {
-                    socket = new MulticastSocket(4446);
-                    
-                    InetAddress address = InetAddress.getByName(grupo);
-                    socket.joinGroup(address);
-                    
-                    DatagramPacket packet;
-                    
-                    byte[] buf = new byte[limit];
-                    packet = new DatagramPacket(buf, buf.length);
-                    socket.receive(packet);
-                    
-                    String received = new String(packet.getData(), 0, packet.getLength());
-                    AgregarRecibidos(packet.getAddress().toString() + ": " + received);
-                }   
-                
-                socket.leaveGroup(address);
-                socket.close();
-            
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        public void detenerHilo() {
-            try {
-                socket.leaveGroup(address);
-                socket.close();
-                unidoAlGrupo = false;
-            } catch (IOException ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        public void AgregarRecibidos(String mensaje){
-          logs.append(mensaje + "\n");
-        }
-    }
-    
-    
 }
