@@ -72,7 +72,8 @@ public class MulticastServer{
     }
 
     public void AgregarRecibidos(String mensaje){
-      logs.append(mensaje + "\n");
+        logs.append(mensaje + "\n");
+        logs.setCaretPosition(logs.getDocument().getLength());
     }
 
     void setGrupo(String elemento) {
