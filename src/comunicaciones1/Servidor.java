@@ -4,20 +4,14 @@
  */
 package comunicaciones1;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JTextArea;
-import javax.swing.ListModel;
 
 /**
  *
@@ -73,6 +67,7 @@ public class Servidor extends Thread{
 
       public void AgregarRecibidos(String mensaje){
           jtareaRecibidos.append(mensaje + "\n");
+          jtareaRecibidos.setCaretPosition(jtareaRecibidos.getDocument().getLength());
       }
 
 }

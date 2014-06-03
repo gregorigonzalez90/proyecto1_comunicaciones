@@ -11,8 +11,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JTextArea;
 
 /**
@@ -59,9 +57,9 @@ public class MulticastServer{
                 socket.close();
 
             } catch (UnknownHostException ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("UnknownHostException");
             } catch (IOException ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("IOException");
             }
         }
     };
@@ -69,6 +67,7 @@ public class MulticastServer{
 
     public void detenerHilo() {
         this.unidoAlGrupo = false;
+        socket.close();
         server.interrupt();
     }
 
