@@ -91,7 +91,7 @@ public class Cliente{
                 while(unidoAlGrupo) {
                     socket = new MulticastSocket(4446);
                     
-                    InetAddress address = InetAddress.getByName("225.5.6.7");
+                    InetAddress address = InetAddress.getByName(grupo);
                     socket.joinGroup(address);
                     
                     DatagramPacket packet;

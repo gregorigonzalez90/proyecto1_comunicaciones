@@ -336,29 +336,52 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if(!listMulticastGroup.isEmpty() && !client.conexionGrupo.unidoAlGrupo) {
-            String elemento = (String) listMulticastGroup.getElementAt(jList1.getSelectedIndex());
-            client.conexionGrupo.unidoAlGrupo = true;
-            client.conexionGrupo.start();
-            jButton2.setText("Salir del grupo");
-        } else if(client.conexionGrupo.unidoAlGrupo) {
-            client.conexionGrupo.detenerHilo();
-            jButton2.setText("Unirse al grupo");
-        }
+        if(!client.conexionGrupo.unidoAlGrupo && !jList1.isSelectionEmpty()) {
+            // Entrar al grupo
+            jButton5.setEnabled(false);
+            jTextField3.setEnabled(false);
+            jButton3.setEnabled(true);
+            jList1.setEnabled(false);
             
+            String elemento = (String) listMulticastGroup.getElementAt(jList1.getSelectedIndex());
+            jTextField3.setText(elemento);
+            jButton2.setText("Salir del grupo");
+            
+            client.conexionGrupo.unidoAlGrupo = true;
+            client.conexionGrupo.setGrupo(elemento);
+            client.conexionGrupo.start();
+        } else if(client.conexionGrupo.unidoAlGrupo) {
+            // Salir del grupo
+            jButton5.setEnabled(true);
+            jButton3.setEnabled(false);
+            jList1.setEnabled(true);
+            jTextField3.setEnabled(true);
+            jTextField3.setText("");
+            jButton2.setText("Unirse al grupo");
+            
+            client.conexionGrupo.detenerHilo();
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // Crear grupo
         jTextField3.setEnabled(false);
         jButton5.setEnabled(false);
-        jButton3.setEnabled(true);
+        jButton3.setEnabled(true);        
+        jList1.setEnabled(false);
+        
+        jButton2.setText("Salir del grupo");
         String grupo = jTextField3.getText();
+        
+        client.conexionGrupo.unidoAlGrupo = true;
         client.conexionGrupo.setGrupo(grupo);
+        client.conexionGrupo.start();
         client.enviarUnicast("255.255.255.255", "Multicast-" + grupo, this.port);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        client.enviarUnicast(jTextField3.getText(), jTextArea2.getText(), this.portMulticast);
+        if(client.conexionGrupo.unidoAlGrupo)
+            client.enviarUnicast(jTextField3.getText(), jTextArea2.getText(), this.portMulticast);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void limpiarCampo() {
